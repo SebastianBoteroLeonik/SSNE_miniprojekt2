@@ -11,6 +11,6 @@ def calc_accuracy(pred_targets, targets):
 
 
 predictions_student = pd.read_csv("pred.csv", header=None).iloc[:, 0]
-labels = pd.read_csv("UNKNOWN.csv", header=None).iloc[:, 0]
+labels = pd.read_csv("output.txt", header=None).iloc[:, 0]
 
 print(calc_accuracy(predictions_student, labels))
