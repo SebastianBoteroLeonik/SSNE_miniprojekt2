@@ -115,10 +115,24 @@ def main():
         model.eval()
         with torch.no_grad():
             preds_train = torch.argmax(model(x_cat, x_num), dim=1)
-            correct = (preds_train == y).sum().item()
-            accuracy = correct / y.shape[0]
+            class_accuracies = []
 
-            print(f"Train Accuracy: {accuracy:.2%}")
+            print("Train Accuracy per class:")
+            for cls in manager.labels:
+                cls_mask = y == cls
+                cls_total = cls_mask.sum().item()
+
+                if cls_total == 0:
+                    print(f"Class {cls}: N/A (0 samples)")
+                    continue
+
+                cls_correct = (preds_train[cls_mask] == y[cls_mask]).sum().item()
+                cls_accuracy = cls_correct / cls_total
+                class_accuracies.append(cls_accuracy)
+                print(f"Class {cls}: {cls_accuracy:.2%} ({cls_correct}/{cls_total})")
+
+            overall_accuracy = np.mean(class_accuracies) if class_accuracies else 0.0
+            print(f"Overall Train Accuracy (mean per class): {overall_accuracy:.2%}")
 
             x_cat_test, x_num_test = manager.get_test_features()
             x_cat_test = x_cat_test.to(device)
